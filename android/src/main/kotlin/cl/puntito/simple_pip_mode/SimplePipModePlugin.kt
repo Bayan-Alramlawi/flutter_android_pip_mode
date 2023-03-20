@@ -10,8 +10,6 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Rational
-import androidx.annotation.NonNull
-import androidx.annotation.RequiresApi
 import cl.puntito.simple_pip_mode.Constants.EXTRA_ACTION_TYPE
 import cl.puntito.simple_pip_mode.Constants.SIMPLE_PIP_ACTION
 import cl.puntito.simple_pip_mode.actions.PipAction
@@ -23,6 +21,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import android.app.ActivityManager
+import io.flutter.plugin.common.MethodChannel
 import androidx.annotation.NonNull
 import io.flutter.plugin.common.MethodChannel
 
@@ -187,8 +186,8 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   private fun checkPipPermission(): Boolean {
-    val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-    return activityManager.isInPictureInPictureMode || packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)
+    val activityManager = activity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    return activityManager.isInPictureInPictureMode || activity.packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)
   }
 
 }
