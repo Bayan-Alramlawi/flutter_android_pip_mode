@@ -27,7 +27,7 @@ class SimplePip {
     return isAvailable ?? false;
   }
 
-  Future<bool> checkPipPermission() async {
+  static Future<bool> checkPipPermission() async {
     bool hasPermission;
     try {
       hasPermission = await _channel.invokeMethod('checkPipPermission');
