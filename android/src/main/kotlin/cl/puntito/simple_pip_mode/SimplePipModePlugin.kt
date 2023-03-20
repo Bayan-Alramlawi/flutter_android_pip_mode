@@ -22,8 +22,6 @@ import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import android.app.ActivityManager
-
 
 /** SimplePipModePlugin */
 class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -75,11 +73,8 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
     if (call.method == "getPlatformVersion") {
       result.success("Android ${Build.VERSION.RELEASE}")
-    }else if (call.method == "checkPipPermission") {
-      result.success(checkPipPermission())
-    } else if (call.method == "isPipAvailable") {
-      result.success(
-        activity.packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)
+    }else if (call.method == "isPipAvailable") {
+      result.success(activity.packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)
       )
     } else if (call.method == "isPipActivated") {
       result.success(activity.isInPictureInPictureMode)
@@ -183,11 +178,6 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       it.setActions(actions).build()
       activity.setPictureInPictureParams(it.build())
     }
-  }
-
-  private fun checkPipPermission(): Boolean {
-    val activityManager = activity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-    return activity.isInPictureInPictureMode || activity.packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)
   }
 
 }

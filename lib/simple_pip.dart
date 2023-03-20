@@ -27,16 +27,6 @@ class SimplePip {
     return isAvailable ?? false;
   }
 
-  static Future<bool> checkPipPermission() async {
-    bool hasPermission;
-    try {
-      hasPermission = await _channel.invokeMethod('checkPipPermission');
-    } on PlatformException catch (e) {
-      print('Failed to check PIP permission: ${e.message}');
-      hasPermission = false;
-    }
-    return hasPermission;
-  }
 
   /// Whether the app is currently in PIP mode.
   static Future<bool> get isPipActivated async {
