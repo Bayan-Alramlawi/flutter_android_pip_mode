@@ -10,6 +10,8 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Rational
+import androidx.annotation.NonNull
+import androidx.annotation.RequiresApi
 import cl.puntito.simple_pip_mode.Constants.EXTRA_ACTION_TYPE
 import cl.puntito.simple_pip_mode.Constants.SIMPLE_PIP_ACTION
 import cl.puntito.simple_pip_mode.actions.PipAction
@@ -18,10 +20,10 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.MethodCall
-import androidx.annotation.RequiresApi
+import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import android.app.ActivityManager
-import androidx.annotation.NonNull
+
 
 /** SimplePipModePlugin */
 class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
