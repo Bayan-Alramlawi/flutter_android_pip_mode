@@ -10,6 +10,9 @@ import 'package:simple_pip_mode/actions/pip_actions_layout.dart';
 /// request entering PIP mode,
 /// and call some callbacks when the app changes its mode.
 class SimplePip {
+
+
+
   static const MethodChannel _channel = MethodChannel('puntito.simple_pip_mode');
 
   /// Whether this device supports PIP mode.
@@ -22,6 +25,17 @@ class SimplePip {
   static Future<bool> get isAutoPipAvailable async {
     final bool? isAvailable = await _channel.invokeMethod('isAutoPipAvailable');
     return isAvailable ?? false;
+  }
+
+  Future<bool> checkPipPermission() async {
+    bool hasPermission;
+    try {
+      hasPermission = await _channel.invokeMethod('checkPipPermission');
+    } on PlatformException catch (e) {
+      print('Failed to check PIP permission: ${e.message}');
+      hasPermission = false;
+    }
+    return hasPermission;
   }
 
   /// Whether the app is currently in PIP mode.
