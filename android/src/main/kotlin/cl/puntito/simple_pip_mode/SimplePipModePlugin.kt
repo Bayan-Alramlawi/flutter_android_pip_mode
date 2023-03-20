@@ -18,12 +18,10 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.MethodCall
-import io.flutter.plugin.common.MethodChannel
+import androidx.annotation.RequiresApi
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import android.app.ActivityManager
-import io.flutter.plugin.common.MethodChannel
 import androidx.annotation.NonNull
-import io.flutter.plugin.common.MethodChannel
 
 /** SimplePipModePlugin */
 class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -187,7 +185,7 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
   private fun checkPipPermission(): Boolean {
     val activityManager = activity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-    return activityManager.isInPictureInPictureMode || activity.packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)
+    return activity.isInPictureInPictureMode || activity.packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)
   }
 
 }
