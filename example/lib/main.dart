@@ -135,6 +135,7 @@ class _ExampleAppState extends State<ExampleApp> {
                     pip.setAutoPipMode(
                       aspectRatio: newValue,
                       seamlessResize: true,
+                      autoEnter: true
                     );
                   }
                   setState(() {
