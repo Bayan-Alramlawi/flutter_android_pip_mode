@@ -10,8 +10,7 @@ import 'package:simple_pip_mode/actions/pip_actions_layout.dart';
 /// request entering PIP mode,
 /// and call some callbacks when the app changes its mode.
 class SimplePip {
-  static const MethodChannel _channel =
-      MethodChannel('puntito.simple_pip_mode');
+  static const MethodChannel _channel = MethodChannel('puntito.simple_pip_mode');
 
   /// Whether this device supports PIP mode.
   static Future<bool> get isPipAvailable async {
@@ -61,10 +60,11 @@ class SimplePip {
   Future<bool> setAutoPipMode({
     aspectRatio = const [16, 9],
     seamlessResize = false,
+    required bool autoEnter,
   }) async {
     Map params = {
       'aspectRatio': aspectRatio,
-      'autoEnter': true,
+      'autoEnter': autoEnter,
       'seamlessResize': seamlessResize,
     };
     final bool? setSuccessfully =
