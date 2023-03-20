@@ -89,7 +89,7 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       var params = PictureInPictureParams.Builder()
         .setAspectRatio(Rational(aspectRatio!![0], aspectRatio[1]))
         .setActions(actions)
-        .setAutoEnterEnabled(autoEnter)
+        .setAutoEnterEnabled(autoEnter!!)
 
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         params = params.setAutoEnterEnabled(autoEnter!!)
@@ -136,7 +136,7 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
         val autoEnter = call.argument<Boolean>("autoEnter")
         val params = PictureInPictureParams.Builder()
           .setAspectRatio(Rational(aspectRatio!![0], aspectRatio[1]))
-          .setAutoEnterEnabled(autoEnter)
+          .setAutoEnterEnabled(autoEnter!!)
           .setSeamlessResizeEnabled(seamlessResize!!)
           .setActions(actions)
 
