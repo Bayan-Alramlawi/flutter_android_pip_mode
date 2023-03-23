@@ -3,14 +3,13 @@ package cl.puntito.simple_pip_mode
 import android.app.Activity
 import android.app.PictureInPictureParams
 import android.app.RemoteAction
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.os.Build
 import android.util.Rational
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
 import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
 import cl.puntito.simple_pip_mode.Constants.EXTRA_ACTION_TYPE
@@ -25,7 +24,7 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 
 /** SimplePipModePlugin */
-class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware, ComponentCallbacks2 {
+class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
   /// The MethodChannel that will the communication between Flutter and native Android
   ///
@@ -37,7 +36,6 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware, Comp
   private lateinit var activity: Activity
   private var actions: MutableList<RemoteAction> = mutableListOf()
   private var actionsLayout: PipActionsLayout = PipActionsLayout.NONE
-  private lateinit var lifecycleObserver: LifecycleObserver
 
   private var callbackHelper = PipCallbackHelper()
   private var params: PictureInPictureParams.Builder? = null
@@ -153,52 +151,18 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware, Comp
     }
   }
 
-
-
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
     activity = binding.activity
-    lifecycleObserver = createPipModeChangedObserver()
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
-    activity.unregisterComponentCallbacks(this)
   }
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
     activity = binding.activity
-    activity.registerComponentCallbacks(this)
   }
 
   override fun onDetachedFromActivity() {
-    activity.unregisterComponentCallbacks(this)
-  }
-
-  override fun onConfigurationChanged(newConfig: Configuration) {
-    // No action required for configuration changes
-  }
-
-  override fun onLowMemory() {
-    // No action required for low memory situations
-  }
-
-  override fun onTrimMemory(level: Int) {
-    // No action required for memory trimming situations
-  }
-
-  private fun createPipModeChangedObserver(): LifecycleObserver {
-    return object : LifecycleObserver {
-      @RequiresApi(Build.VERSION_CODES.O)
-      @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-      fun onMoveToBackground() {
-        if (activity.isInPictureInPictureMode) {
-          val action = PipAction.PAUSE
-          action.afterAction()?.let {
-            toggleAction(action)
-          }
-          callbackHelper.onPipAction(action)
-        }
-      }
-    }
   }
 
   @RequiresApi(Build.VERSION_CODES.O)
