@@ -158,7 +158,6 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware, Comp
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
     activity = binding.activity
     lifecycleObserver = createPipModeChangedObserver()
-    binding.activity.lifecycle.addObserver(lifecycleObserver)
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
