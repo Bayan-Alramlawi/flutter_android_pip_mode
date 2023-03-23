@@ -169,11 +169,9 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware, Comp
     activity.unregisterComponentCallbacks(this)
   }
 
-  @RequiresApi(Build.VERSION_CODES.O)
-  override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
-    super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+  override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {
     if (!isInPictureInPictureMode) {
-      val action = PipAction.Pause
+      val action = PipAction.PAUSE
       action.afterAction()?.let {
         toggleAction(action)
       }
