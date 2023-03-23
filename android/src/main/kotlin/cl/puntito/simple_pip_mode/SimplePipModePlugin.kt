@@ -37,6 +37,7 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware, Comp
   private lateinit var activity: Activity
   private var actions: MutableList<RemoteAction> = mutableListOf()
   private var actionsLayout: PipActionsLayout = PipActionsLayout.NONE
+  private lateinit var lifecycleObserver: LifecycleObserver
 
   private var callbackHelper = PipCallbackHelper()
   private var params: PictureInPictureParams.Builder? = null
