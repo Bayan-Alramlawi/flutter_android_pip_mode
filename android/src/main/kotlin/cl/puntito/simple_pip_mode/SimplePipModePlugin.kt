@@ -8,6 +8,9 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
 import android.util.Rational
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
 import cl.puntito.simple_pip_mode.Constants.EXTRA_ACTION_TYPE
@@ -153,7 +156,8 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware, Comp
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
     activity = binding.activity
-    activity.registerComponentCallbacks(this)
+    lifecycleObserver = createPipModeChangedObserver()
+    binding.activity.lifecycle.addObserver(lifecycleObserver)
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
@@ -177,14 +181,23 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware, Comp
     // No action required for low memory situations
   }
 
-  @RequiresApi(Build.VERSION_CODES.O)
-  override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {
-    if (!isInPictureInPictureMode) {
-      val action = PipAction.PAUSE
-      action.afterAction()?.let {
-        toggleAction(action)
+  override fun onTrimMemory(level: Int) {
+    // No action required for memory trimming situations
+  }
+
+  private fun createPipModeChangedObserver(): LifecycleObserver {
+    return object : LifecycleObserver {
+      @RequiresApi(Build.VERSION_CODES.O)
+      @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+      fun onMoveToBackground() {
+        if (activity.isInPictureInPictureMode) {
+          val action = PipAction.PAUSE
+          action.afterAction()?.let {
+            toggleAction(action)
+          }
+          callbackHelper.onPipAction(action)
+        }
       }
-      callbackHelper.onPipAction(action)
     }
   }
 
