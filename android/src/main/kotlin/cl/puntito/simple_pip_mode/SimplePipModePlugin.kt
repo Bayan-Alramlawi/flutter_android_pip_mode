@@ -3,11 +3,9 @@ package cl.puntito.simple_pip_mode
 import android.app.Activity
 import android.app.PictureInPictureParams
 import android.app.RemoteAction
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Build
 import android.util.Rational
 import androidx.annotation.NonNull
@@ -24,7 +22,7 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 
 /** SimplePipModePlugin */
-class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
+class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware, ComponentCallbacks2 {
 
   /// The MethodChannel that will the communication between Flutter and native Android
   ///
@@ -151,18 +149,36 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     }
   }
 
+
+
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
     activity = binding.activity
+    activity.registerComponentCallbacks(this)
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
+    activity.unregisterComponentCallbacks(this)
   }
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
     activity = binding.activity
+    activity.registerComponentCallbacks(this)
   }
 
   override fun onDetachedFromActivity() {
+    activity.unregisterComponentCallbacks(this)
+  }
+
+  @RequiresApi(Build.VERSION_CODES.O)
+  override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
+    super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+    if (!isInPictureInPictureMode) {
+      val action = PipAction.Pause
+      action.afterAction()?.let {
+        toggleAction(action)
+      }
+      callbackHelper.onPipAction(action)
+    }
   }
 
   @RequiresApi(Build.VERSION_CODES.O)
