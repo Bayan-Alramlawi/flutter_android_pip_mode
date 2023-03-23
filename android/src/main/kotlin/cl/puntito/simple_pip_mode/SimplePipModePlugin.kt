@@ -169,6 +169,14 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware, Comp
     activity.unregisterComponentCallbacks(this)
   }
 
+  override fun onConfigurationChanged(newConfig: Configuration) {
+    // No action required for configuration changes
+  }
+
+  override fun onLowMemory() {
+    // No action required for low memory situations
+  }
+
   @RequiresApi(Build.VERSION_CODES.O)
   override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {
     if (!isInPictureInPictureMode) {
