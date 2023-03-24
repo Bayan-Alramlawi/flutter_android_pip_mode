@@ -23,6 +23,7 @@ open class PipCallbackHelper {
       channel.invokeMethod("onPipEntered", null)
     } else {
       channel.invokeMethod("onPipExited", null)
+      onPipAction(PipAction.PAUSE)
     }
   }
 

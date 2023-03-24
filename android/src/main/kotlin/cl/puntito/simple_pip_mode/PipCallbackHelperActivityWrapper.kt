@@ -21,10 +21,5 @@ open class PipCallbackHelperActivityWrapper: FlutterActivity() {
     callbackHelper.onPictureInPictureModeChanged(active)
   }
 
-  override fun onStop() {
-    super.onStop()
-    print("CLOSED FINALLY")
-    callbackHelper.onPipAction(PipAction.PAUSE)
-  }
 
 }
