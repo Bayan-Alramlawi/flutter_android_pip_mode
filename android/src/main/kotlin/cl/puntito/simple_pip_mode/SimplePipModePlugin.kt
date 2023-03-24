@@ -156,16 +156,16 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
-    sendPipBroadcast(PipAction.PAUSE, activity)
+    callbackHelper.onPipAction(PipAction.PAUSE)
   }
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
     activity = binding.activity
-    sendPipBroadcast(PipAction.PAUSE, activity)
+    callbackHelper.onPipAction(PipAction.PAUSE)
   }
 
   override fun onDetachedFromActivity() {
-    sendPipBroadcast(PipAction.PAUSE, activity)
+    callbackHelper.onPipAction(PipAction.PAUSE)
   }
 
   @RequiresApi(Build.VERSION_CODES.O)
@@ -182,14 +182,5 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       activity.setPictureInPictureParams(it.build())
     }
   }
-
-
-
-  private fun sendPipBroadcast(pipAction: PipAction, context: Context) {
-    val intent = Intent(SIMPLE_PIP_ACTION).putExtra(EXTRA_ACTION_TYPE, pipAction.name)
-    context.sendBroadcast(intent)
-  }
-
-
 
 }
