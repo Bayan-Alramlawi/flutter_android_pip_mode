@@ -183,9 +183,9 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
   override fun onStop() {
     super.onStop()
-    sendPipBroadcast(PipAction.PAUSE)
-
+    PipAction.PAUSE
   }
+
 
 
 }
