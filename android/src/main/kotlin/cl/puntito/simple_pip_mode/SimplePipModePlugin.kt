@@ -156,16 +156,13 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
-    callbackHelper.onPipAction(PipAction.PAUSE)
   }
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
     activity = binding.activity
-    callbackHelper.onPipAction(PipAction.PAUSE)
   }
 
   override fun onDetachedFromActivity() {
-    callbackHelper.onPipAction(PipAction.PAUSE)
   }
 
   @RequiresApi(Build.VERSION_CODES.O)
