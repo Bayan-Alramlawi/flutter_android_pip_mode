@@ -5,6 +5,7 @@ import androidx.annotation.NonNull
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import cl.puntito.simple_pip_mode.PipCallbackHelper
+import cl.puntito.simple_pip_mode.actions.PipAction
 
 
 open class PipCallbackHelperActivityWrapper: FlutterActivity() {
@@ -19,4 +20,10 @@ open class PipCallbackHelperActivityWrapper: FlutterActivity() {
     super.onPictureInPictureModeChanged(active, newConfig)
     callbackHelper.onPictureInPictureModeChanged(active)
   }
+
+  override fun onStop() {
+    super.onStop()
+    callbackHelper.onPipAction(PipAction.PAUSE)
+  }
+
 }
