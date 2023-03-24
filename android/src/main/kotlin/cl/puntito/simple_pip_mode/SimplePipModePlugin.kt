@@ -183,7 +183,17 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
   override fun onStop() {
     super.onStop()
-    PipAction.PAUSE
+    if (activity.isInPictureInPictureMode) {
+      sendPipBroadcast(PipAction.PAUSE)
+    }
+  }
+
+
+
+  private fun sendPipBroadcast(pipAction: PipAction) {
+    val context: Context = this
+    val intent = Intent(SIMPLE_PIP_ACTION).putExtra(EXTRA_ACTION_TYPE, pipAction.name)
+    context.sendBroadcast(intent)
   }
 
 
