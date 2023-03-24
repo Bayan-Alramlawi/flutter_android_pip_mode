@@ -153,6 +153,13 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
     activity = binding.activity
+    binding.addLifecycleListener(object : LifecycleListener {
+      override fun onStop() {
+        if (activity.isInPictureInPictureMode) {
+          sendPipBroadcast(PipAction.PAUSE, activity)
+        }
+      }
+    })
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
@@ -181,17 +188,8 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
 
-  override fun onStop() {
-    super.onStop()
-    if (activity.isInPictureInPictureMode) {
-      sendPipBroadcast(PipAction.PAUSE)
-    }
-  }
 
-
-
-  private fun sendPipBroadcast(pipAction: PipAction) {
-    val context: Context = this
+  private fun sendPipBroadcast(pipAction: PipAction, context: Context) {
     val intent = Intent(SIMPLE_PIP_ACTION).putExtra(EXTRA_ACTION_TYPE, pipAction.name)
     context.sendBroadcast(intent)
   }
