@@ -49,31 +49,38 @@ class SimplePip {
     autoEnter = false,
     seamlessResize = false,
   }) async {
-    Map params = {
-      'aspectRatio': aspectRatio,
-      'autoEnter': autoEnter,
-      'seamlessResize': seamlessResize,
-    };
-    final bool? enteredSuccessfully =
-        await _channel.invokeMethod('enterPipMode', params);
-    return enteredSuccessfully ?? false;
+    try {
+      Map params = {
+        'aspectRatio': aspectRatio,
+        'autoEnter': autoEnter,
+        'seamlessResize': seamlessResize,
+      };
+      final bool? enteredSuccessfully = await _channel.invokeMethod('enterPipMode', params);
+      return enteredSuccessfully ?? false;
+    } catch (e) {
+      return false;
+    }
   }
 
   /// Request setting automatic PIP mode.
   /// Android 12 (Android S, API level 31) or newer required.
+  /// Request setting automatic PIP mode.
   Future<bool> setAutoPipMode({
     aspectRatio = const [16, 9],
     seamlessResize = false,
     required bool autoEnter,
   }) async {
-    Map params = {
-      'aspectRatio': aspectRatio,
-      'autoEnter': autoEnter,
-      'seamlessResize': seamlessResize,
-    };
-    final bool? setSuccessfully =
-        await _channel.invokeMethod('setAutoPipMode', params);
-    return setSuccessfully ?? false;
+    try {
+      Map params = {
+        'aspectRatio': aspectRatio,
+        'autoEnter': autoEnter,
+        'seamlessResize': seamlessResize,
+      };
+      final bool? setSuccessfully = await _channel.invokeMethod('setAutoPipMode', params);
+      return setSuccessfully ?? false;
+    } catch (e) {
+      return false;
+    }
   }
 
   /// Updates the current actions layout with a preset layout

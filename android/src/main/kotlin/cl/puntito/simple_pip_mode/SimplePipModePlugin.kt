@@ -70,100 +70,93 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   @RequiresApi(Build.VERSION_CODES.O)
+
+  @RequiresApi(Build.VERSION_CODES.O)
   override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-    if (call.method == "getPlatformVersion") {
-      result.success("Android ${Build.VERSION.RELEASE}")
-    } else if (call.method == "isPipAvailable") {
-      if (activity != null) {
-        result.success(activity!!.packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE))
-      } else {
-        result.error("ActivityNotInitialized", "Activity has not been initialized", null)
+    if (activity == null) {
+      result.error("ActivityNotInitialized", "Activity has not been initialized", null)
+      return
+    }
+
+    when (call.method) {
+      "getPlatformVersion" -> {
+        result.success("Android ${Build.VERSION.RELEASE}")
       }
-    } else if (call.method == "isPipActivated") {
-      if (activity != null) {
-        result.success(activity!!.isInPictureInPictureMode)
-      } else {
-        result.error("ActivityNotInitialized", "Activity has not been initialized", null)
+      "isPipAvailable" -> {
+        result.success(activity?.packageManager?.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE) ?: false)
       }
-    } else if (call.method == "isAutoPipAvailable") {
-      result.success(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-    } else if (call.method == "enterPipMode") {
-      if (activity != null) {
+      "isPipActivated" -> {
+        result.success(activity?.isInPictureInPictureMode ?: false)
+      }
+      "enterPipMode" -> {
         val aspectRatio = call.argument<List<Int>>("aspectRatio")
         val autoEnter = call.argument<Boolean>("autoEnter")
         val seamlessResize = call.argument<Boolean>("seamlessResize")
-        var params = PictureInPictureParams.Builder()
+        val params = PictureInPictureParams.Builder()
           .setAspectRatio(Rational(aspectRatio!![0], aspectRatio[1]))
           .setActions(actions)
           .setAutoEnterEnabled(autoEnter!!)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-          params = params.setAutoEnterEnabled(autoEnter!!)
-            .setSeamlessResizeEnabled(seamlessResize!!)
+          params.setAutoEnterEnabled(autoEnter).setSeamlessResizeEnabled(seamlessResize!!)
         }
 
         this.params = params
-
-        result.success(
-          activity!!.enterPictureInPictureMode(params.build())
-        )
-      } else {
-        result.error("ActivityNotInitialized", "Activity has not been initialized", null)
+        result.success(activity?.enterPictureInPictureMode(params.build()) ?: false)
       }
-    } else if (call.method == "setPipLayout") {
-      val success = call.argument<String>("layout")?.let {
-        try {
-          actionsLayout = PipActionsLayout.valueOf(it.uppercase())
-          actions = actionsLayout.remoteActions(context)
-          true
-        } catch(e: Exception) {
-          false
-        }
-      } ?: false
-      result.success(success)
-    } else if (call.method == "setIsPlaying") {
-      call.argument<Boolean>("isPlaying")?.let { isPlaying ->
-        if (actionsLayout.actions.contains(PipAction.PLAY) ||
-          actionsLayout.actions.contains(PipAction.PAUSE)) {
-          var i = actionsLayout.actions.indexOf(PipAction.PLAY)
-          if (i == -1) {
-            i = actionsLayout.actions.indexOf(PipAction.PAUSE)
+      "setPipLayout" -> {
+        val success = call.argument<String>("layout")?.let {
+          try {
+            actionsLayout = PipActionsLayout.valueOf(it.uppercase())
+            actions = actionsLayout.remoteActions(context)
+            true
+          } catch (e: Exception) {
+            false
           }
-          if( i >= 0) {
-            actionsLayout.actions[i] = if(isPlaying) PipAction.PAUSE else PipAction.PLAY
-            renderPipActions()
-            result.success(true)
+        } ?: false
+        result.success(success)
+      }
+      "setIsPlaying" -> {
+        call.argument<Boolean>("isPlaying")?.let { isPlaying ->
+          if (actionsLayout.actions.contains(PipAction.PLAY) || actionsLayout.actions.contains(PipAction.PAUSE)) {
+            var i = actionsLayout.actions.indexOf(PipAction.PLAY)
+            if (i == -1) {
+              i = actionsLayout.actions.indexOf(PipAction.PAUSE)
+            }
+            if (i >= 0) {
+              actionsLayout.actions[i] = if (isPlaying) PipAction.PAUSE else PipAction.PLAY
+              renderPipActions()
+              result.success(true)
+            }
+          } else {
+            result.success(false)
           }
-        } else {
-          result.success(false)
-        }
-      } ?: result.success(false)
-    } else if (call.method == "setAutoPipMode") {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        val aspectRatio = call.argument<List<Int>>("aspectRatio")
-        val seamlessResize = call.argument<Boolean>("seamlessResize")
-        val autoEnter = call.argument<Boolean>("autoEnter")
-        val params = PictureInPictureParams.Builder()
-          .setAspectRatio(Rational(aspectRatio!![0], aspectRatio[1]))
-          .setAutoEnterEnabled(autoEnter!!)
-          .setSeamlessResizeEnabled(seamlessResize!!)
-          .setActions(actions)
+        } ?: result.success(false)
+      }
+      "setAutoPipMode" -> {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+          val aspectRatio = call.argument<List<Int>>("aspectRatio")
+          val seamlessResize = call.argument<Boolean>("seamlessResize")
+          val autoEnter = call.argument<Boolean>("autoEnter")
+          val params = PictureInPictureParams.Builder()
+            .setAspectRatio(Rational(aspectRatio!![0], aspectRatio[1]))
+            .setAutoEnterEnabled(autoEnter!!)
+            .setSeamlessResizeEnabled(seamlessResize!!)
+            .setActions(actions)
 
-        this.params = params
-
-        if (activity != null) {
-          activity!!.setPictureInPictureParams(params.build())
+          this.params = params
+          activity?.setPictureInPictureParams(params.build())
           result.success(true)
         } else {
-          result.error("ActivityNotInitialized", "Activity has not been initialized", null)
+          result.error("NotImplemented", "System Version less than Android S found", "Expected Android S or newer.")
         }
-      } else {
-        result.error("NotImplemented", "System Version less than Android S found", "Expected Android S or newer.")
       }
-    } else {
-      result.notImplemented()
+      else -> {
+        result.notImplemented()
+      }
     }
   }
+
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
     activity = binding.activity
