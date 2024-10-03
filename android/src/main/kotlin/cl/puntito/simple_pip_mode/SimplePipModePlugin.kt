@@ -33,7 +33,7 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   private val CHANNEL = "puntito.simple_pip_mode"
   private lateinit var channel: MethodChannel
   private lateinit var context: Context
-  private lateinit var activity: Activity
+  private var activity: Activity? = null
   private var actions: MutableList<RemoteAction> = mutableListOf()
   private var actionsLayout: PipActionsLayout = PipActionsLayout.NONE
 
@@ -73,32 +73,43 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
     if (call.method == "getPlatformVersion") {
       result.success("Android ${Build.VERSION.RELEASE}")
-    }else if (call.method == "isPipAvailable") {
-      result.success(activity.packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)
-      )
+    } else if (call.method == "isPipAvailable") {
+      if (activity != null) {
+        result.success(activity!!.packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE))
+      } else {
+        result.error("ActivityNotInitialized", "Activity has not been initialized", null)
+      }
     } else if (call.method == "isPipActivated") {
-      result.success(activity.isInPictureInPictureMode)
+      if (activity != null) {
+        result.success(activity!!.isInPictureInPictureMode)
+      } else {
+        result.error("ActivityNotInitialized", "Activity has not been initialized", null)
+      }
     } else if (call.method == "isAutoPipAvailable") {
       result.success(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
     } else if (call.method == "enterPipMode") {
-      val aspectRatio = call.argument<List<Int>>("aspectRatio")
-      val autoEnter = call.argument<Boolean>("autoEnter")
-      val seamlessResize = call.argument<Boolean>("seamlessResize")
-      var params = PictureInPictureParams.Builder()
-        .setAspectRatio(Rational(aspectRatio!![0], aspectRatio[1]))
-        .setActions(actions)
-        .setAutoEnterEnabled(autoEnter!!)
+      if (activity != null) {
+        val aspectRatio = call.argument<List<Int>>("aspectRatio")
+        val autoEnter = call.argument<Boolean>("autoEnter")
+        val seamlessResize = call.argument<Boolean>("seamlessResize")
+        var params = PictureInPictureParams.Builder()
+          .setAspectRatio(Rational(aspectRatio!![0], aspectRatio[1]))
+          .setActions(actions)
+          .setAutoEnterEnabled(autoEnter!!)
 
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        params = params.setAutoEnterEnabled(autoEnter!!)
-          .setSeamlessResizeEnabled(seamlessResize!!)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+          params = params.setAutoEnterEnabled(autoEnter!!)
+            .setSeamlessResizeEnabled(seamlessResize!!)
+        }
+
+        this.params = params
+
+        result.success(
+          activity!!.enterPictureInPictureMode(params.build())
+        )
+      } else {
+        result.error("ActivityNotInitialized", "Activity has not been initialized", null)
       }
-
-      this.params = params
-
-      result.success(
-        activity.enterPictureInPictureMode(params.build())
-      )
     } else if (call.method == "setPipLayout") {
       val success = call.argument<String>("layout")?.let {
         try {
@@ -140,9 +151,12 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
 
         this.params = params
 
-        activity.setPictureInPictureParams(params.build())
-
-        result.success(true)
+        if (activity != null) {
+          activity!!.setPictureInPictureParams(params.build())
+          result.success(true)
+        } else {
+          result.error("ActivityNotInitialized", "Activity has not been initialized", null)
+        }
       } else {
         result.error("NotImplemented", "System Version less than Android S found", "Expected Android S or newer.")
       }
@@ -156,6 +170,7 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
+    activity = null
   }
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
@@ -163,6 +178,7 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   override fun onDetachedFromActivity() {
+    activity = null
   }
 
   @RequiresApi(Build.VERSION_CODES.O)
@@ -176,7 +192,7 @@ class SimplePipModePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     actions = PipActionsLayout.remoteActions(context, actionsLayout.actions)
     params?.let {
       it.setActions(actions).build()
-      activity.setPictureInPictureParams(it.build())
+      activity?.setPictureInPictureParams(it.build())
     }
   }
 
