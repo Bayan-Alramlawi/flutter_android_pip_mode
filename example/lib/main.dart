@@ -78,7 +78,6 @@ class _ExampleAppState extends State<ExampleApp> {
         // builder is null so child is used when not in pip mode
         pipLayout: pipActionsLayout,
         onPipAction: (action) {
-          print("PIP ACTION TAP: " + action.name);
           switch (action) {
             case PipAction.play:
               // example: videoPlayerController.play();
